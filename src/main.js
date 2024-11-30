@@ -1,14 +1,15 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
+// Initialisierung von Kaplay mit Hintergrundfarbe
 const k = kaplay({
   background: [0, 0, 0], // Hintergrund schwarz
 });
 
-// Laden der benötigten Sprites
-//k.loadSprite("marie", "sprites/snowboarder.png");
+// Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
+k.loadSound("collisionSound", "sounds/hit.mp3");
 
 const PLAYERS = [
   { name: "Viktoria", sprite: "bean" },
@@ -30,6 +31,13 @@ const PLAYERS = [
 PLAYERS.sort((a, b) => a.name.localeCompare(b.name));
 
 const SPEED = 600;
+
+// Schwierigkeitsstufen definieren
+const DIFFICULTIES = [
+  { name: "einfach", maxObstacles: 5, obstacleSpawnInterval: 1 },
+  { name: "mittel", maxObstacles: 10, obstacleSpawnInterval: 0.7 },
+  { name: "schwer", maxObstacles: 15, obstacleSpawnInterval: 0.5 },
+];
 
 // Fragen definieren
 const multiplicationQuestions = [];
@@ -89,33 +97,54 @@ function spawnStars(count) {
       k.rect(3, 3),
       k.color(255, 255, 255),
       k.opacity(0.8),
-      k.move(k.DOWN, SPEED / 6),
-      k.offscreen({ destroy: true }),
       "star",
       { z: 0 },
+      {
+        update() {
+          this.move(k.vec2(0, SPEED / 6));
+          if (this.pos.y > k.height()) {
+            this.destroy();
+          }
+        },
+      },
     ]);
   }
 }
 
 // Intro-Szene
 k.scene("intro", () => {
+  // Variablen für ausgewählten Spieler und Schwierigkeit
+  let selectedPlayerIndex = 0;
+  let selectedPlayer = PLAYERS[selectedPlayerIndex];
+  let selectedDifficultyIndex = 1; // Mittel
+  let selectedDifficulty = DIFFICULTIES[selectedDifficultyIndex];
+
+  const playerSprites = [];
+  const difficultyButtons = [];
+  const difficultyTexts = [];
+
   // Sterne spawnen
-  k.loop(1, () => {
+  spawnStars(50); // Anfangssterne
+
+  const starsLoop = k.loop(1, () => {
     spawnStars(10);
   });
 
   k.add([
-    k.pos(k.width() / 2, 50),
+    k.pos(k.width() / 2, 150),
     k.anchor("center"),
-    k.text("Rettet Ilvie", { size: 32, align: "center" }),
+    k.text("Rettet Ilvie", { size: 72, align: "center" }),
     k.color(255, 255, 255),
     { z: 100 },
   ]);
 
   k.add([
-    k.pos(k.width() / 2, 200),
+    k.pos(k.width() / 2, 400),
     k.anchor("center"),
-    k.text("Ilvie hat sich im Weltall verlaufen und findet eure Direktorin nicht mehr. Rettet sie und bringt sie zurück zu Frau Zdarsky. Aber gebt euch in acht. fiese Multiplikations- und Divisions-Asteroiden fliegen durch das Weltall und machen euch das Leben schwer.", { size: 18, align: "center", width: k.width() / 2 }),
+    k.text(
+      "Ilvie hat sich im Weltall verlaufen und findet eure Direktorin nicht mehr. Rettet sie und bringt sie zurück zu Frau Zdarsky. Aber gebt euch in Acht: Fiese Multiplikations- und Divisions-Asteroiden fliegen durch das Weltall und machen euch das Leben schwer.",
+      { size: 32, align: "center", width: k.width() / 1.2 }
+    ),
     k.color(255, 255, 255),
     { z: 100 },
   ]);
@@ -132,7 +161,7 @@ k.scene("intro", () => {
   const gridHeight = rows * spriteHeight + (rows - 1) * vSpacing;
 
   const startX = (k.width() - gridWidth) / 2;
-  const startY = 400; // Startposition Y
+  const startY = 650; // Startposition Y
 
   PLAYERS.forEach((player, index) => {
     const col = index % columns;
@@ -141,33 +170,185 @@ k.scene("intro", () => {
     const x = startX + col * (spriteWidth + hSpacing) + spriteWidth / 2;
     const y = startY + row * (spriteHeight + vSpacing) + spriteHeight / 2;
 
-    const spriteObj = k.add([
+    const isSelected = index === selectedPlayerIndex;
+
+    // Container für Sprite und Hintergrund
+    const spriteContainer = k.add([
       k.pos(x, y),
       k.anchor("center"),
-      k.sprite(player.sprite, { width: spriteWidth, height: spriteHeight }),
-      k.area(),
       { z: 100 },
+      { playerIndex: index },
     ]);
 
-    spriteObj.onClick(() => k.go("game", player));
+    // Hintergrund für Auswahl
+    const background = spriteContainer.add([
+      k.rect(spriteWidth, spriteHeight),
+      k.anchor("center"),
+      k.color(isSelected ? k.rgb(255, 255, 0) : k.rgb(0, 0, 0, 0)),
+      { z: -1 },
+      k.area({ width: spriteWidth, height: spriteHeight }), // Fläche für Klicks
+    ]);
 
-    const playerText = k.add([
+    // Hintergrund als Eigenschaft speichern
+    spriteContainer.background = background;
+
+    // Sprite des Spielers
+    const spriteObj = spriteContainer.add([
+      k.sprite(player.sprite, { width: spriteWidth, height: spriteHeight }),
+      k.anchor("center"),
+      { z: 0 },
+    ]);
+
+    // Klickereignis auf den Hintergrund
+    background.onClick(() => {
+      selectedPlayerIndex = index;
+      selectedPlayer = PLAYERS[selectedPlayerIndex];
+
+      // Auswahl visuell aktualisieren
+      playerSprites.forEach((container, i) => {
+        const bg = container.background;
+        if (i === selectedPlayerIndex) {
+          bg.color = k.rgb(255, 255, 0);
+        } else {
+          bg.color = k.rgb(0, 0, 0, 0);
+        }
+      });
+    });
+
+    // Textfeld mit Hintergrund für Klickbereich
+    const textContainer = k.add([
       k.pos(x, y + spriteHeight / 2 + 20),
       k.anchor("center"),
-      k.text(player.name, { size: 24, align: "center" }),
-      k.color(255, 255, 255),
-      k.area(),
       { z: 100 },
     ]);
-    playerText.onClick(() => k.go("game", player));
+
+    // Hintergrundrechteck für den Text
+    const textBackground = textContainer.add([
+      k.rect(spriteWidth, 30),
+      k.anchor("center"),
+      k.color(0, 0, 0, 0), // Transparent
+      k.area({ width: spriteWidth, height: 30 }), // Fläche für Klicks
+    ]);
+
+    // Text des Spielers
+    const playerText = textContainer.add([
+      k.text(player.name, { size: 24, align: "center" }),
+      k.anchor("center"),
+      k.color(255, 255, 255),
+      { z: 0 },
+    ]);
+
+    // Klickereignis auf den Texthintergrund
+    textBackground.onClick(() => {
+      selectedPlayerIndex = index;
+      selectedPlayer = PLAYERS[selectedPlayerIndex];
+
+      // Auswahl visuell aktualisieren
+      playerSprites.forEach((container, i) => {
+        const bg = container.background;
+        if (i === selectedPlayerIndex) {
+          bg.color = k.rgb(255, 255, 0);
+        } else {
+          bg.color = k.rgb(0, 0, 0, 0);
+        }
+      });
+    });
+
+    playerSprites.push(spriteContainer);
+  });
+
+  // Schwierigkeitsauswahl
+  const buttonWidth = 200;
+  const buttonHeight = 50;
+  const buttonSpacing = 50;
+
+  const totalButtonWidth =
+    DIFFICULTIES.length * buttonWidth + (DIFFICULTIES.length - 1) * buttonSpacing;
+  const startXButtons = (k.width() - totalButtonWidth) / 2;
+  const buttonsY = startY + rows * (spriteHeight + vSpacing) + 100; // Anpassen nach Bedarf
+
+  DIFFICULTIES.forEach((difficulty, index) => {
+    const x = startXButtons + index * (buttonWidth + buttonSpacing) + buttonWidth / 2;
+    const y = buttonsY;
+
+    const isSelected = index === selectedDifficultyIndex;
+
+    const button = k.add([
+      k.rect(buttonWidth, buttonHeight),
+      k.pos(x, y),
+      k.anchor("center"),
+      k.color(isSelected ? k.rgb(255, 255, 0) : k.rgb(100, 100, 100)),
+      k.area({ width: buttonWidth, height: buttonHeight }), // Fläche für Klicks
+      { z: 100 },
+      { difficultyIndex: index },
+    ]);
+
+    const buttonText = k.add([
+      k.pos(x, y),
+      k.anchor("center"),
+      k.text(difficulty.name, { size: 24 }),
+      k.color(isSelected ? k.rgb(0, 0, 0) : k.rgb(255, 255, 255)), // Textfarbe ändern
+      { z: 100 },
+    ]);
+
+    button.onClick(() => {
+      selectedDifficultyIndex = index;
+      selectedDifficulty = DIFFICULTIES[selectedDifficultyIndex];
+
+      // Auswahl visuell aktualisieren
+      difficultyButtons.forEach((btn, i) => {
+        const text = difficultyTexts[i];
+        if (i === selectedDifficultyIndex) {
+          btn.color = k.rgb(255, 255, 0);
+          text.color = k.rgb(0, 0, 0); // Textfarbe auf Schwarz setzen
+        } else {
+          btn.color = k.rgb(100, 100, 100);
+          text.color = k.rgb(255, 255, 255); // Textfarbe auf Weiß setzen
+        }
+      });
+    });
+
+    difficultyButtons.push(button);
+    difficultyTexts.push(buttonText); // Füge das Textobjekt zur Liste hinzu
+  });
+
+  // "Spiel starten"-Button
+  const startButtonY = buttonsY + buttonHeight + 100;
+
+  const startButton = k.add([
+    k.rect(400, 50),
+    k.pos(k.width() / 2, startButtonY),
+    k.anchor("center"),
+    k.color(100, 100, 100),
+    k.area({ width: 400, height: 50 }), // Fläche für Klicks
+    { z: 100 },
+  ]);
+
+  k.add([
+    k.text("Spiel starten", { size: 24 }),
+    k.pos(k.width() / 2, startButtonY),
+    k.anchor("center"),
+    k.color(255, 255, 255),
+    { z: 100 },
+  ]);
+
+  startButton.onClick(() => {
+    // Stoppe den Sterne-Loop in der Intro-Szene
+    starsLoop.cancel();
+    // Spiel mit ausgewähltem Spieler und Schwierigkeit starten
+    k.go("game", selectedPlayer, selectedDifficulty);
   });
 });
 
 // Spielszene
-k.scene("game", (playerData) => {
+k.scene("game", (playerData, difficultyData) => {
   let gamePaused = false;
   let hasDog = false; // Ob der Spieler den Hund hat
   let ownerAppeared = false; // Ob die Besitzerin erschienen ist
+
+  // Schwierigkeitsparameter
+  const maxObstacles = difficultyData.maxObstacles;
+  const obstacleSpawnInterval = difficultyData.obstacleSpawnInterval;
 
   // Hilfsfunktion zum Begrenzen von Werten
   function clamp(value, min, max) {
@@ -177,54 +358,91 @@ k.scene("game", (playerData) => {
   // Steuerungsgeschwindigkeit erhöhen
   const playerSpeedMultiplier = 3; // Faktor erhöht, um den Spieler schneller zu machen
 
-  // Event handler functions
-  function leftHandler() {
-    if (!gamePaused) {
-      ufo.move(k.LEFT.scale(SPEED * playerSpeedMultiplier));
-      ufo.angle = -15;
-    }
-  }
+  // Bewegungseingaben
+  let moveLeft = false;
+  let moveRight = false;
+  let moveUp = false;
+  let moveDown = false;
 
-  function rightHandler() {
-    if (!gamePaused) {
-      ufo.move(k.RIGHT.scale(SPEED * playerSpeedMultiplier));
-      ufo.angle = 15;
-    }
-  }
-
-  function upHandler() {
-    if (!gamePaused) {
-      ufo.move(k.UP.scale(SPEED * playerSpeedMultiplier));
-    }
-  }
-
-  function downHandler() {
-    if (!gamePaused) {
-      ufo.move(k.DOWN.scale(SPEED * playerSpeedMultiplier));
-    }
-  }
-
-  function releaseHandler() {
-    if (!gamePaused) {
-      ufo.angle = 0;
-    }
-  }
-
-  function pausedMove(dir, speed) {
-    return {
-      id: "pausedMove",
-      require: ["pos"],
+  // Spieler
+  const ufo = k.add([
+    k.pos(k.width() / 2, k.height() - 200),
+    k.anchor("center"),
+    k.sprite(playerData.sprite, { width: 100, height: 100 }),
+    k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
+    k.rotate(0),
+    "player",
+    { z: 100 },
+    {
+      // Begrenzung innerhalb des Bildschirms
       update() {
-        if (!gamePaused) {
-          this.move(dir.scale(speed));
-        }
+        this.pos.x = clamp(this.pos.x, 0, k.width());
+        this.pos.y = clamp(this.pos.y, 0, k.height());
       },
-    };
-  }
+    },
+  ]);
+
+  // Tastatursteuerung
+  k.onKeyDown("left", () => {
+    moveLeft = true;
+  });
+  k.onKeyRelease("left", () => {
+    moveLeft = false;
+  });
+
+  k.onKeyDown("right", () => {
+    moveRight = true;
+  });
+  k.onKeyRelease("right", () => {
+    moveRight = false;
+  });
+
+  k.onKeyDown("up", () => {
+    moveUp = true;
+  });
+  k.onKeyRelease("up", () => {
+    moveUp = false;
+  });
+
+  k.onKeyDown("down", () => {
+    moveDown = true;
+  });
+  k.onKeyRelease("down", () => {
+    moveDown = false;
+  });
+
+  // Spielerbewegung in jedem Frame aktualisieren
+  k.onUpdate(() => {
+    if (!gamePaused) {
+      let dir = k.vec2(0, 0);
+      if (moveLeft) dir.x -= 1;
+      if (moveRight) dir.x += 1;
+      if (moveUp) dir.y -= 1;
+      if (moveDown) dir.y += 1;
+
+      if (dir.len() > 0) {
+        dir = dir.unit();
+        ufo.move(dir.scale(SPEED * playerSpeedMultiplier));
+
+        // Spielerrotation basierend auf horizontaler Bewegung
+        ufo.angle = dir.x * -15;
+      } else {
+        ufo.angle = 0;
+      }
+    }
+  });
+
+  // Touch-Steuerung
+  k.onUpdate(() => {
+    if (!gamePaused) {
+      if (k.isMouseDown()) {
+        ufo.pos = k.mousePos();
+      }
+    }
+  });
 
   // Funktion zum Spawnen von Hindernissen
   let obstaclesOnScreen = 0;
-  const maxObstacles = 5; // Maximale Anzahl von Hindernissen gleichzeitig
 
   function spawnObstacle() {
     if (obstaclesOnScreen >= maxObstacles) return;
@@ -237,7 +455,7 @@ k.scene("game", (playerData) => {
     const dirX = k.rand(-0.5, 0.5);
     const dir = k.vec2(dirX, 1).unit();
 
-    const speed = k.rand(SPEED / 4, SPEED / 2); // Zufällige Geschwindigkeit
+    const speed = k.rand(SPEED / 2, SPEED); // Zufällige Geschwindigkeit
     const rotationSpeed = k.rand(-30, 30); // Zufällige Drehgeschwindigkeit
 
     obstaclesOnScreen++;
@@ -246,7 +464,7 @@ k.scene("game", (playerData) => {
       k.pos(startX, startY),
       k.rect(50, 50), // Größere Hindernisse
       k.color(0, 127, 255),
-      k.area(),
+      k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
       "obstacle",
       { z: 0 },
@@ -260,7 +478,11 @@ k.scene("game", (playerData) => {
             this.angle += this.rotationSpeed;
 
             // Zerstören, wenn außerhalb des Bildschirms
-            if (this.pos.y > k.height() + 50) {
+            if (
+              this.pos.y > k.height() + 50 ||
+              this.pos.x < -50 ||
+              this.pos.x > k.width() + 50
+            ) {
               obstaclesOnScreen--;
               this.destroy();
             }
@@ -270,42 +492,20 @@ k.scene("game", (playerData) => {
     ]);
   }
 
-  // Sterne spawnen
-  spawnStars(50); // Anfangssterne
-
-  // Spieler
-  const ufo = k.add([
-    k.pos(k.width() / 2, k.height() - 200),
-    k.anchor("center"),
-    k.sprite(playerData.sprite, { width: 200, height: 200 }),
-    k.area(),
-    k.rotate(0),
-    "player",
-    { z: 100 },
-    {
-      // Begrenzung innerhalb des Bildschirms
-      update() {
-        this.pos.x = clamp(this.pos.x, 0, k.width());
-        this.pos.y = clamp(this.pos.y, 0, k.height());
-      },
-    },
-  ]);
-
-  // Steuerung
-  k.onKeyDown("left", leftHandler);
-  k.onKeyDown("right", rightHandler);
-  k.onKeyDown("up", upHandler);
-  k.onKeyDown("down", downHandler);
-  k.onKeyRelease(releaseHandler);
-  // Touch-Steuerung
-  k.onUpdate(() => {
+  // Hindernisse spawnen
+  const obstacleLoop = k.loop(obstacleSpawnInterval, () => {
     if (!gamePaused) {
-      if (k.isMouseDown()) {
-        ufo.pos = k.mousePos();
-      }
+      spawnObstacle();
     }
   });
 
+  // Sterne spawnen
+  spawnStars(50); // Anfangssterne
+
+  // Sterne-Loop
+  const starsLoop = k.loop(1, () => {
+    spawnStars(10);
+  });
 
   // Kollisionen
   ufo.onCollide("obstacle", (obstacle) => {
@@ -314,22 +514,11 @@ k.scene("game", (playerData) => {
       gamePaused = true;
       obstacle.destroy();
       obstaclesOnScreen--;
+
+      k.play("collisionSound");
+
       showQuestion();
     }
-  });
-
-  // Hindernisse spawnen
-  const obstacleSpawnInterval = 1; // Intervall zum Überprüfen des Spawns
-
-  const obstacleLoop = k.loop(obstacleSpawnInterval, () => {
-    if (!gamePaused) {
-      spawnObstacle();
-    }
-  });
-
-  // Sterne spawnen
-  const starsLoop = k.loop(1, () => {
-    spawnStars(10);
   });
 
   // Hund spawnen
@@ -339,13 +528,13 @@ k.scene("game", (playerData) => {
       k.rect(50, 50),
       k.color(139, 69, 19), // Braune Farbe für den Hund
       k.pos(k.rand(0, k.width()), k.rand(0, k.height() / 2)),
-      k.area(),
+      k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
       "dog",
       { z: 0 },
       {
         dir: k.vec2(k.rand(-1, 1), k.rand(-1, 1)).unit(),
-        speed: SPEED / 8,
+        speed: SPEED / 6,
         rotationSpeed: k.rand(-30, 30),
         update() {
           if (!gamePaused) {
@@ -373,10 +562,11 @@ k.scene("game", (playerData) => {
 
         // Hund an den Spieler anhängen
         ufo.add([
-          k.rect(50, 50),
+          k.rect(30, 30),
           k.color(139, 69, 19),
-          k.pos(-50, 0),
+          k.pos(-40, 0),
           k.anchor("center"),
+          k.area({ width: 30, height: 30 }), // Fläche für Kollisionen
           "dogAttached",
         ]);
 
@@ -399,14 +589,14 @@ k.scene("game", (playerData) => {
       k.color(255, 0, 0), // Rote Farbe für die Besitzerin
       k.pos(k.rand(0, k.width()), -100), // Startet oberhalb des Bildschirms
       k.anchor("center"),
-      k.area(),
+      k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
       "owner",
       { z: 0 },
       {
         update() {
           if (!gamePaused) {
             // Besitzerin bewegt sich langsam nach unten
-            this.move(k.DOWN.scale(SPEED / 4));
+            this.move(k.vec2(0, SPEED / 6));
 
             // Begrenzung innerhalb des Bildschirms
             if (this.pos.y > k.height() + 100) {
@@ -445,9 +635,7 @@ k.scene("game", (playerData) => {
         ];
     } else if (divisionQuestions.length > 0) {
       question =
-        divisionQuestions[
-          Math.floor(Math.random() * divisionQuestions.length)
-        ];
+        divisionQuestions[Math.floor(Math.random() * divisionQuestions.length)];
     } else if (multiplicationQuestions.length > 0) {
       question =
         multiplicationQuestions[
@@ -461,8 +649,8 @@ k.scene("game", (playerData) => {
 
     // Frage anzeigen
     const questionText = k.add([
-      k.text(question.question, { size: 24, width: k.width() - 40 }),
-      k.pos(k.width() - 100, k.height() / 2 - 100),
+      k.text(question.question, { size: 48, width: k.width() }),
+      k.pos(k.width() - 150, k.height() / 2 - 250),
       k.anchor("center"),
       k.color(255, 255, 255),
       { z: 200 },
@@ -472,9 +660,9 @@ k.scene("game", (playerData) => {
     const optionButtons = [];
     const optionTexts = [];
     const optionCount = question.options.length;
-    const buttonWidth = 200;
-    const buttonHeight = 50;
-    const spacing = 20;
+    const buttonWidth = 400;
+    const buttonHeight = 100;
+    const spacing = 50;
     const totalHeight =
       optionCount * buttonHeight + (optionCount - 1) * spacing;
     const startY = k.height() / 2 - totalHeight / 2 + 50;
@@ -485,14 +673,14 @@ k.scene("game", (playerData) => {
         k.pos(k.width() / 2, startY + index * (buttonHeight + spacing)),
         k.anchor("center"),
         k.color(100, 100, 100),
-        k.area(),
+        k.area({ width: buttonWidth, height: buttonHeight }), // Fläche für Klicks
         "optionButton",
         { option },
         { z: 200 },
       ]);
 
       const buttonText = k.add([
-        k.text(option.toString(), { size: 24 }),
+        k.text(option.toString(), { size: 42 }),
         k.pos(k.width() / 2, startY + index * (buttonHeight + spacing)),
         k.anchor("center"),
         k.color(255, 255, 255),
@@ -512,7 +700,7 @@ k.scene("game", (playerData) => {
           gamePaused = false;
         } else {
           // Falsche Antwort
-          k.debug.log("Falsche Antwort. Versuche es erneut.");
+          console.log("Falsche Antwort. Versuche es erneut.");
         }
       });
 
@@ -531,14 +719,6 @@ k.scene("game", (playerData) => {
     k.get("dogAttached").forEach((obj) => k.destroy(obj));
     if (owner) k.destroy(owner);
 
-    // Zielgrafik anzeigen
-    /*k.add([
-      k.sprite("goal"),
-      k.pos(k.width() / 2, k.height() / 2 - 100),
-      k.anchor("center"),
-      { z: 200 },
-    ]);*/
-
     // Nachricht anzeigen
     k.add([
       k.text(`Du hast das Ziel erreicht!`, { size: 32 }),
@@ -554,7 +734,7 @@ k.scene("game", (playerData) => {
       k.pos(k.width() / 2, k.height() / 2 + 100),
       k.anchor("center"),
       k.color(100, 100, 100),
-      k.area(),
+      k.area({ width: 400, height: 50 }), // Fläche für Klicks
       { z: 200 },
     ]);
 
