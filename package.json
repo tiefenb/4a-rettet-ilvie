@@ -1,16 +1,21 @@
 {
 	"name": "schlittenspiel",
 	"type": "module",
+	"private": true,
 	"scripts": {
 		"build": "vite build",
 		"dev": "vite",
 		"preview": "vite preview",
-		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip dist -x \"**/.DS_Store\""
+		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip dist -x \"**/.DS_Store\"",
+		"predeploy" : "npm run build",
+    	"deploy" : "gh-pages -d dist"
 	},
 	"dependencies": {
 		"kaplay": "^3001.0.2"
 	},
 	"devDependencies": {
+		"gh-pages": "^6.2.0",
 		"vite": "^6.0.1"
-	}
+	},
+	"homepage": "https://tiefenb.github.io/4a-rettet-ilvie/"
 }
