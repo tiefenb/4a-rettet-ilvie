@@ -297,6 +297,15 @@ k.scene("game", (playerData) => {
   k.onKeyDown("up", upHandler);
   k.onKeyDown("down", downHandler);
   k.onKeyRelease(releaseHandler);
+  // Touch-Steuerung
+  k.onUpdate(() => {
+    if (!gamePaused) {
+      if (k.isMouseDown()) {
+        ufo.pos = k.mousePos();
+      }
+    }
+  });
+
 
   // Kollisionen
   ufo.onCollide("obstacle", (obstacle) => {
