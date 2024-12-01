@@ -6,6 +6,47 @@ const k = kaplay({
   background: [0, 0, 0], // Hintergrund schwarz
 });
 
+// Funktion zum Anpassen der Canvas-Größe
+function resizeCanvas() {
+  k.canvas.width = window.innerWidth;
+  k.canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+
+// Überwachen von Größenänderungen des Fensters
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  k.go("intro"); // Spiel neu starten, um Größen anzupassen
+});
+
+// Gerätedrehung überwachen
+function checkOrientation() {
+  // Überprüfen, ob es sich um ein Mobilgerät handelt
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    if (window.innerWidth > window.innerHeight) {
+      // Landscape mode
+      document.getElementById("rotate-message").style.display = "flex";
+    } else {
+      // Portrait mode
+      document.getElementById("rotate-message").style.display = "none";
+    }
+  } else {
+    // Auf dem Desktop sicherstellen, dass die Nachricht ausgeblendet ist
+    document.getElementById("rotate-message").style.display = "none";
+  }
+}
+
+window.addEventListener("orientationchange", () => {
+  checkOrientation();
+  location.reload(); // Seite neu laden, um Größen anzupassen
+});
+
+// Initiale Überprüfung der Orientierung
+checkOrientation();
+
 // Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
@@ -131,7 +172,7 @@ k.scene("intro", () => {
   });
 
   k.add([
-    k.pos(k.width() / 2, 150),
+    k.pos(k.width() / 2, k.height() / 15),
     k.anchor("center"),
     k.text("Rettet Ilvie", { size: 72, align: "center" }),
     k.color(255, 255, 255),
@@ -139,7 +180,7 @@ k.scene("intro", () => {
   ]);
 
   k.add([
-    k.pos(k.width() / 2, 400),
+    k.pos(k.width() / 2, k.height() / 5),
     k.anchor("center"),
     k.text(
       "Ilvie hat sich im Weltall verlaufen und findet eure Direktorin nicht mehr. Rettet sie und bringt sie zurück zu Frau Zdarsky. Aber gebt euch in Acht: Fiese Multiplikations- und Divisions-Asteroiden fliegen durch das Weltall und machen euch das Leben schwer.",
@@ -154,14 +195,14 @@ k.scene("intro", () => {
   const spriteHeight = 100;
   const hSpacing = 50; // Horizontaler Abstand
   const vSpacing = 50; // Vertikaler Abstand
-  const columns = 3; // Anzahl der Spalten
+  const columns = 5; // Anzahl der Spalten
   const rows = Math.ceil(PLAYERS.length / columns);
 
   const gridWidth = columns * spriteWidth + (columns - 1) * hSpacing;
   const gridHeight = rows * spriteHeight + (rows - 1) * vSpacing;
 
   const startX = (k.width() - gridWidth) / 2;
-  const startY = 650; // Startposition Y
+  const startY = (k.height() - gridHeight) / 2;
 
   PLAYERS.forEach((player, index) => {
     const col = index % columns;
@@ -313,7 +354,7 @@ k.scene("intro", () => {
   });
 
   // "Spiel starten"-Button
-  const startButtonY = buttonsY + buttonHeight + 100;
+  const startButtonY = buttonsY + buttonHeight + 50;
 
   const startButton = k.add([
     k.rect(400, 50),
