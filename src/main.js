@@ -75,9 +75,9 @@ const SPEED = 600;
 
 // Schwierigkeitsstufen definieren
 const DIFFICULTIES = [
-  { name: "einfach", maxObstacles: 5, obstacleSpawnInterval: 1 },
-  { name: "mittel", maxObstacles: 10, obstacleSpawnInterval: 0.7 },
-  { name: "schwer", maxObstacles: 15, obstacleSpawnInterval: 0.5 },
+  { name: "einfach", maxObstacles: 8, obstacleSpawnInterval: 0.8 },
+  { name: "mittel", maxObstacles: 12, obstacleSpawnInterval: 0.6 },
+  { name: "schwer", maxObstacles: 20, obstacleSpawnInterval: 0.4 },
 ];
 
 // Fragen definieren
@@ -409,8 +409,8 @@ k.scene("game", (playerData, difficultyData) => {
   const ufo = k.add([
     k.pos(k.width() / 2, k.height() - 200),
     k.anchor("center"),
-    k.sprite(playerData.sprite, { width: 100, height: 100 }),
-    k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
+    k.sprite(playerData.sprite, { width: 200, height: 200 }),
+    k.area({ width: 210, height: 210 }), // Fläche für Kollisionen
     k.rotate(0),
     "player",
     { z: 100 },
