@@ -49,7 +49,9 @@ checkOrientation();
 
 // Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
+k.loadSprite("dog", "sprites/dog.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
+k.loadSprite("asteroid", "sprites/asteroid.png");
 k.loadSound("collisionSound", "sounds/hit.mp3");
 
 const PLAYERS = [
@@ -496,15 +498,14 @@ k.scene("game", (playerData, difficultyData) => {
     const dirX = k.rand(-0.5, 0.5);
     const dir = k.vec2(dirX, 1).unit();
 
-    const speed = k.rand(SPEED / 2, SPEED); // Zufällige Geschwindigkeit
-    const rotationSpeed = k.rand(-30, 30); // Zufällige Drehgeschwindigkeit
+    const speed = k.rand(SPEED / 10, SPEED); // Zufällige Geschwindigkeit
+    const rotationSpeed = k.rand(-6, 6); // Zufällige Drehgeschwindigkeit
 
     obstaclesOnScreen++;
 
     k.add([
       k.pos(startX, startY),
-      k.rect(50, 50), // Größere Hindernisse
-      k.color(0, 127, 255),
+      k.sprite("asteroid", { width: 70, height: 70 }),
       k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
       "obstacle",
@@ -566,8 +567,7 @@ k.scene("game", (playerData, difficultyData) => {
   let dog;
   function spawnDog() {
     dog = k.add([
-      k.rect(50, 50),
-      k.color(139, 69, 19), // Braune Farbe für den Hund
+      k.sprite("dog", { width: 70, height: 70 }),
       k.pos(k.rand(0, k.width()), k.rand(0, k.height() / 2)),
       k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
@@ -576,7 +576,7 @@ k.scene("game", (playerData, difficultyData) => {
       {
         dir: k.vec2(k.rand(-1, 1), k.rand(-1, 1)).unit(),
         speed: SPEED / 6,
-        rotationSpeed: k.rand(-30, 30),
+        rotationSpeed: k.rand(-2, 2),
         update() {
           if (!gamePaused) {
             this.move(this.dir.scale(this.speed));
@@ -603,9 +603,8 @@ k.scene("game", (playerData, difficultyData) => {
 
         // Hund an den Spieler anhängen
         ufo.add([
-          k.rect(30, 30),
-          k.color(139, 69, 19),
-          k.pos(-40, 0),
+          k.sprite("dog", { width: 70, height: 70 }),
+          k.pos(110, 0),
           k.anchor("center"),
           k.area({ width: 30, height: 30 }), // Fläche für Kollisionen
           "dogAttached",
@@ -731,17 +730,18 @@ k.scene("game", (playerData, difficultyData) => {
       button.onClick(() => {
         if (option === question.answer) {
           // Richtige Antwort
-          k.destroy(questionText); // Frage entfernen
-          optionButtons.forEach((btn) => {
-            k.destroy(btn);
-          });
           optionTexts.forEach((txt) => {
             k.destroy(txt);
           });
+          optionButtons.forEach((btn) => {
+            k.destroy(btn);
+          });
+          k.destroy(questionText); // Frage entfernen
           gamePaused = false;
         } else {
+          gamePaused = true;
           // Falsche Antwort
-          console.log("Falsche Antwort. Versuche es erneut.");
+          // console.log("Falsche Antwort. Versuche es erneut.");
         }
       });
 
