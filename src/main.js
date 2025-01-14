@@ -192,6 +192,38 @@ k.scene("intro", () => {
     { z: 100 },
   ]);
 
+  // Hund spawnen
+  function spawnDog() {
+    k.add([
+      k.sprite("dog", { width: 100, height: 100 }),
+      k.pos(k.rand(0, k.width()), k.rand(0, k.height() / 2)),
+      k.rotate(0),
+      "introDog",
+      { z: 1 },
+      {
+        dir: k.vec2(k.rand(-1, 1), k.rand(-1, 1)).unit(),
+        speed: SPEED / 6,
+        rotationSpeed: k.rand(-2, 2),
+        update() {
+            this.move(this.dir.scale(this.speed));
+            this.angle += this.rotationSpeed;
+
+            // Kollision mit Bildschirmrand
+            if (this.pos.x <= 0 || this.pos.x >= k.width()) {
+              this.dir.x = -this.dir.x;
+              this.rotationSpeed = -this.rotationSpeed; // Drehrichtung umkehren
+            }
+            if (this.pos.y <= 0 || this.pos.y >= k.height()) {
+              this.dir.y = -this.dir.y;
+              this.rotationSpeed = -this.rotationSpeed; // Drehrichtung umkehren
+            }
+        },
+      },
+    ]);
+  }
+
+  spawnDog(); // Hund initial spawnen im intro
+  
   // Grid-Konfiguration
   const spriteWidth = 100;
   const spriteHeight = 100;
@@ -509,7 +541,7 @@ k.scene("game", (playerData, difficultyData) => {
       k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
       "obstacle",
-      { z: 0 },
+      { z: 1 },
       {
         dir: dir,
         speed: speed,
@@ -572,7 +604,7 @@ k.scene("game", (playerData, difficultyData) => {
       k.area({ width: 50, height: 50 }), // Fläche für Kollisionen
       k.rotate(0),
       "dog",
-      { z: 0 },
+      { z: 1 },
       {
         dir: k.vec2(k.rand(-1, 1), k.rand(-1, 1)).unit(),
         speed: SPEED / 6,
