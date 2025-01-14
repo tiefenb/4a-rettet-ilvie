@@ -631,7 +631,7 @@ k.scene("game", (playerData, difficultyData) => {
       k.anchor("center"),
       k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
       "owner",
-      { z: 0 },
+      { z: 1 },
       {
         update() {
           if (!gamePaused) {
