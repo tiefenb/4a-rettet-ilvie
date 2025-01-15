@@ -181,7 +181,7 @@ k.scene("intro", () => {
   k.add([
     k.pos(k.width() / 2, k.height() / 15),
     k.anchor("center"),
-    k.text("Rettet Ilvie", { size: 72, align: "center" }),
+    k.text("Rettet Ilvie", { size: isMobile ? 64 : 72, align: "center" }),
     k.color(255, 255, 255),
     { z: 100 },
   ]);
@@ -191,7 +191,7 @@ k.scene("intro", () => {
     k.anchor("center"),
     k.text(
       "Ilvie hat sich im Weltall verlaufen und findet eure Direktorin nicht mehr. Rettet sie und bringt sie zurück zu Frau Zdarsky. Aber gebt euch in Acht: Fiese Multiplikations- und Divisions-Asteroiden fliegen durch das Weltall und machen euch das Leben schwer.",
-      { size: 32, align: "center", width: k.width() / 1.2 }
+      { size: isMobile ? 28 : 32, align: "center", width: k.width() / 1.2 }
     ),
     k.color(255, 255, 255),
     { z: 100 },
