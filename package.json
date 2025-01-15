@@ -11,7 +11,7 @@
     	"deploy" : "gh-pages -d dist"
 	},
 	"dependencies": {
-		"kaplay": "^3001.0.6"
+		"kaplay": "^3001.0.7"
 	},
 	"devDependencies": {
 		"gh-pages": "^6.3.0",
