@@ -23,9 +23,10 @@ window.addEventListener("resize", () => {
 // Gerätedrehung überwachen
 function checkOrientation() {
   // Überprüfen, ob es sich um ein Mobilgerät handelt
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isMobile = /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) || (navigator.userAgent.includes("Macintosh") && 'ontouchend' in document);
 
   if (isMobile) {
+    console.log("hallo", window.innerWidth, window.innerHeight);
     if (window.innerWidth > window.innerHeight) {
       // Landscape mode
       document.getElementById("rotate-message").style.display = "flex";
