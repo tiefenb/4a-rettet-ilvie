@@ -1,6 +1,9 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
+// Überprüfen, ob es sich um ein Mobilgerät handelt
+const isMobile = /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) || (navigator.userAgent.includes("Macintosh") && 'ontouchend' in document);
+
 // Initialisierung von Kaplay mit Hintergrundfarbe
 const k = kaplay({
   background: [0, 0, 0], // Hintergrund schwarz
@@ -22,8 +25,6 @@ window.addEventListener("resize", () => {
 
 // Gerätedrehung überwachen
 function checkOrientation() {
-  // Überprüfen, ob es sich um ein Mobilgerät handelt
-  const isMobile = /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) || (navigator.userAgent.includes("Macintosh") && 'ontouchend' in document);
 
   if (isMobile) {
     console.log("hallo", window.innerWidth, window.innerHeight);
