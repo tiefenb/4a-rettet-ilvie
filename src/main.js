@@ -52,9 +52,11 @@ k.loadSprite("bean", "sprites/bean.png");
 k.loadSprite("dog", "sprites/dog.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
 k.loadSprite("asteroid", "sprites/asteroid.png");
+k.loadSprite("direktion", "sprites/direktion.png");
 k.loadSound("collisionSound", "sounds/hit.mp3");
 
 const PLAYERS = [
+  { name: "Lan", sprite: "bean" },
   { name: "Viktoria", sprite: "bean" },
   { name: "Marie", sprite: "bean" },
   { name: "Nora", sprite: "bean" },
@@ -68,7 +70,8 @@ const PLAYERS = [
   { name: "Felicitas", sprite: "bean" },
   { name: "Laura", sprite: "bean" },
   { name: "Nino", sprite: "bean" },
-  { name: "Lan", sprite: "bean" },
+  // { name: "Fr. Jurušić", sprite: "bean" },
+  // { name: "Anita", sprite: "bean" },
 ];
 
 PLAYERS.sort((a, b) => a.name.localeCompare(b.name));
@@ -223,6 +226,27 @@ k.scene("intro", () => {
   }
 
   spawnDog(); // Hund initial spawnen im intro
+
+  // spawn owner fr intro
+  k.add([
+    k.sprite("direktion", { width: 200, height: 200 }),
+    k.pos(k.rand(0, k.width()), -100), // Startet oberhalb des Bildschirms
+    k.anchor("center"),
+    k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
+    "ownerIntro",
+    { z: 1 },
+    {
+      update() {
+          // Besitzerin bewegt sich langsam nach unten
+          this.move(k.vec2(0, SPEED / 6));
+
+          // Begrenzung innerhalb des Bildschirms
+          if (this.pos.y > k.height() + 100) {
+            this.pos.y = -100; // Wieder nach oben setzen
+          }
+      },
+    },
+  ]);
   
   // Grid-Konfiguration
   const spriteWidth = 100;
@@ -547,7 +571,6 @@ k.scene("game", (playerData, difficultyData) => {
         speed: speed,
         rotationSpeed: rotationSpeed,
         update() {
-          if (!gamePaused) {
             this.move(this.dir.scale(this.speed));
             this.angle += this.rotationSpeed;
 
@@ -560,7 +583,6 @@ k.scene("game", (playerData, difficultyData) => {
               obstaclesOnScreen--;
               this.destroy();
             }
-          }
         },
       },
     ]);
@@ -568,9 +590,7 @@ k.scene("game", (playerData, difficultyData) => {
 
   // Hindernisse spawnen
   const obstacleLoop = k.loop(obstacleSpawnInterval, () => {
-    if (!gamePaused) {
       spawnObstacle();
-    }
   });
 
   // Sterne spawnen
@@ -582,10 +602,12 @@ k.scene("game", (playerData, difficultyData) => {
   });
 
   // Kollisionen
+  let freeTime = false;
   ufo.onCollide("obstacle", (obstacle) => {
     // Spiel pausieren und Frage anzeigen
-    if (!gamePaused) {
+    if (!gamePaused && !freeTime) {
       gamePaused = true;
+      freeTime = true;
       obstacle.destroy();
       obstaclesOnScreen--;
 
@@ -657,8 +679,7 @@ k.scene("game", (playerData, difficultyData) => {
   let owner;
   function spawnOwner() {
     owner = k.add([
-      k.rect(100, 100),
-      k.color(255, 0, 0), // Rote Farbe für die Besitzerin
+      k.sprite("direktion", { width: 200, height: 200 }),
       k.pos(k.rand(0, k.width()), -100), // Startet oberhalb des Bildschirms
       k.anchor("center"),
       k.area({ width: 100, height: 100 }), // Fläche für Kollisionen
@@ -689,6 +710,7 @@ k.scene("game", (playerData, difficultyData) => {
 
   // Funktion zum Anzeigen einer Frage
   function showQuestion() {
+
     // Überprüfen, ob Fragen verfügbar sind
     if (multiplicationQuestions.length === 0 && divisionQuestions.length === 0) {
       console.error("Es sind keine Fragen verfügbar.");
@@ -770,6 +792,9 @@ k.scene("game", (playerData, difficultyData) => {
           });
           k.destroy(questionText); // Frage entfernen
           gamePaused = false;
+          window.setTimeout(() => {
+            freeTime = false;
+          }, 2000);
         } else {
           gamePaused = true;
           // Falsche Antwort
@@ -793,7 +818,7 @@ k.scene("game", (playerData, difficultyData) => {
     if (owner) k.destroy(owner);
 
     // Nachricht anzeigen
-    k.add([
+    const goalText = k.add([
       k.text(`Du hast das Ziel erreicht!`, { size: 32 }),
       k.pos(k.width() / 2, k.height() / 2),
       k.anchor("center"),
@@ -811,7 +836,7 @@ k.scene("game", (playerData, difficultyData) => {
       { z: 200 },
     ]);
 
-    k.add([
+    const restartButtonText = k.add([
       k.text("Spiel neu starten", { size: 24 }),
       k.pos(k.width() / 2, k.height() / 2 + 100),
       k.anchor("center"),
@@ -820,6 +845,10 @@ k.scene("game", (playerData, difficultyData) => {
     ]);
 
     restartButton.onClick(() => {
+      k.destroy(goalText);
+      k.destroy(restartButtonText);
+      k.destroy(restartButton);
+
       // Stoppe alle Loops
       obstacleLoop.cancel();
       starsLoop.cancel();
