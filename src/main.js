@@ -63,7 +63,7 @@ k.loadSound("collisionSound", "sounds/hit.mp3");
 const PLAYERS = [
   { name: "Lan", sprite: "bean" },
   { name: "Viktoria", sprite: "bean" },
-  { name: "Marie", sprite: "marie" },
+  { name: "Marie", sprite: "marie", collisionAreaWidth: 50 },
   { name: "Nora", sprite: "bean" },
   { name: "Lorenz", sprite: "bean" },
   { name: "Raphael", sprite: "bean" },
@@ -75,7 +75,7 @@ const PLAYERS = [
   { name: "Felicitas", sprite: "bean" },
   { name: "Laura", sprite: "bean" },
   { name: "Nino", sprite: "bean" },
-  { name: "Fr. Jurušić", sprite: "lehrerin" },
+  { name: "Fr. Jurušić", sprite: "lehrerin", collisionAreaWidth: 50 },
 ];
 
 PLAYERS.sort((a, b) => a.name.localeCompare(b.name));
@@ -488,7 +488,7 @@ k.scene("game", (playerData, difficultyData) => {
     k.pos(k.width() / 2, k.height() - 200),
     k.anchor("center"),
     k.sprite(playerData.sprite, { width: 200, height: 200 }),
-    k.area({ width: 150, height: 150 }), // Fläche für Kollisionen
+    k.area({ width: playerData.collisionAreaWidth || 180, height: playerData.collisionAreaWidth || 180 }), // Fläche für Kollisionen
     k.rotate(0),
     "player",
     { z: 100 },
@@ -551,11 +551,18 @@ k.scene("game", (playerData, difficultyData) => {
     }
   });
 
+  // Funktion zur Berechnung der Richtung und Bewegung des Spielers
+  function moveTowards(targetPos, speed) {
+    const direction = targetPos.sub(ufo.pos).unit();
+    ufo.move(direction.scale(speed));
+  }
+
   // Touch-Steuerung
   k.onUpdate(() => {
     if (!gamePaused) {
       if (k.isMouseDown()) {
-        ufo.pos = k.mousePos();
+        const targetPos = k.mousePos();
+        moveTowards(targetPos, SPEED * playerSpeedMultiplier);
       }
     }
   });
