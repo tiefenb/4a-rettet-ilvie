@@ -52,6 +52,8 @@ checkOrientation();
 // Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
 k.loadSprite("marie", "sprites/marie.png");
+k.loadSprite("lehrerin", "sprites/lehrerin.png");
+
 k.loadSprite("dog", "sprites/dog.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
 k.loadSprite("asteroid", "sprites/asteroid.png");
@@ -73,6 +75,7 @@ const PLAYERS = [
   { name: "Felicitas", sprite: "bean" },
   { name: "Laura", sprite: "bean" },
   { name: "Nino", sprite: "bean" },
+  { name: "Fr. Jurušić", sprite: "lehrerin" },
 ];
 
 PLAYERS.sort((a, b) => a.name.localeCompare(b.name));
