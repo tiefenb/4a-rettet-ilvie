@@ -51,6 +51,7 @@ checkOrientation();
 
 // Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
+k.loadSprite("marie", "sprites/marie.png");
 k.loadSprite("dog", "sprites/dog.png");
 k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
 k.loadSprite("asteroid", "sprites/asteroid.png");
@@ -60,7 +61,7 @@ k.loadSound("collisionSound", "sounds/hit.mp3");
 const PLAYERS = [
   { name: "Lan", sprite: "bean" },
   { name: "Viktoria", sprite: "bean" },
-  { name: "Marie", sprite: "bean" },
+  { name: "Marie", sprite: "marie" },
   { name: "Nora", sprite: "bean" },
   { name: "Lorenz", sprite: "bean" },
   { name: "Raphael", sprite: "bean" },
@@ -72,8 +73,6 @@ const PLAYERS = [
   { name: "Felicitas", sprite: "bean" },
   { name: "Laura", sprite: "bean" },
   { name: "Nino", sprite: "bean" },
-  // { name: "Fr. Jurušić", sprite: "bean" },
-  // { name: "Anita", sprite: "bean" },
 ];
 
 PLAYERS.sort((a, b) => a.name.localeCompare(b.name));
@@ -300,10 +299,26 @@ k.scene("intro", () => {
       { z: 0 },
     ]);
 
+    let preselectPlayer = localStorage.getItem("selectedPlayer");
+    if(preselectPlayer && preselectPlayer.length > 0) {
+      preselectPlayer = parseInt(preselectPlayer);
+      selectedPlayerIndex = preselectPlayer;
+      selectedPlayer = PLAYERS[selectedPlayerIndex];
+      playerSprites.forEach((container, i) => {
+        const bg = container.background;
+        if (i === preselectPlayer) {
+          bg.color = k.rgb(255, 255, 0);
+        } else {
+          bg.color = k.rgb(0, 0, 0, 0);
+        }
+      });
+    }
+    
     // Klickereignis auf den Hintergrund
     background.onClick(() => {
       selectedPlayerIndex = index;
       selectedPlayer = PLAYERS[selectedPlayerIndex];
+      localStorage.setItem("selectedPlayer", selectedPlayerIndex);
 
       // Auswahl visuell aktualisieren
       playerSprites.forEach((container, i) => {
@@ -470,7 +485,7 @@ k.scene("game", (playerData, difficultyData) => {
     k.pos(k.width() / 2, k.height() - 200),
     k.anchor("center"),
     k.sprite(playerData.sprite, { width: 200, height: 200 }),
-    k.area({ width: 210, height: 210 }), // Fläche für Kollisionen
+    k.area({ width: 150, height: 150 }), // Fläche für Kollisionen
     k.rotate(0),
     "player",
     { z: 100 },
