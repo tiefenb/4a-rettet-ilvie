@@ -551,18 +551,22 @@ k.scene("game", (playerData, difficultyData) => {
     }
   });
 
-  // Funktion zur Berechnung der Richtung und Bewegung des Spielers
-  function moveTowards(targetPos, speed) {
-    const direction = targetPos.sub(ufo.pos).unit();
-    ufo.move(direction.scale(speed));
-  }
+  let isPlayerGrabbed = false;
+
+  // Touch-Steuerung
+  ufo.onClick(() => {
+    isPlayerGrabbed = true;
+  });
+
+  k.onMouseRelease(() => {
+    isPlayerGrabbed = false;
+  });
 
   // Touch-Steuerung
   k.onUpdate(() => {
-    if (!gamePaused) {
+    if (!gamePaused && isPlayerGrabbed) {
       if (k.isMouseDown()) {
-        const targetPos = k.mousePos();
-        moveTowards(targetPos, SPEED * playerSpeedMultiplier);
+        ufo.pos = k.mousePos();
       }
     }
   });
