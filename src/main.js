@@ -78,12 +78,12 @@ k.loadSound("music", "sounds/music.mp3");
 
 let musicStarted = false;
 function startMusic() {
-
-  if(!musicStarted) {
-    k.play("music", { loop: true });
-  }
-
-  musicStarted = true;
+  window.setTimeout(function() {
+    if(!musicStarted) {
+      k.play("music", { loop: true });
+      musicStarted = true;
+    }
+  }, 500);
 }
 
 const PLAYERS = [
@@ -439,6 +439,8 @@ k.scene("intro", () => {
     ]);
 
     button.onClick(() => {
+      startMusic();
+
       selectedDifficultyIndex = index;
       selectedDifficulty = DIFFICULTIES[selectedDifficultyIndex];
 
@@ -489,6 +491,8 @@ k.scene("intro", () => {
 
 // Spielszene
 k.scene("game", (playerData, difficultyData) => {
+  startMusic();
+
   let gamePaused = false;
   let hasDog = false; // Ob der Spieler den Hund hat
   let ownerAppeared = false; // Ob die Besitzerin erschienen ist
