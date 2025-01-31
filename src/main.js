@@ -51,7 +51,22 @@ checkOrientation();
 
 // Laden der benötigten Sprites und Sounds
 k.loadSprite("bean", "sprites/bean.png");
+
 k.loadSprite("marie", "sprites/marie.png");
+// k.loadSprite("lan", "sprites/lan.png");
+k.loadSprite("viktoria", "sprites/viktoria.png");
+k.loadSprite("emilia", "sprites/emilia.png");
+k.loadSprite("nora", "sprites/nora.png");
+k.loadSprite("lorenz", "sprites/lorenz.png");
+k.loadSprite("raphael", "sprites/raphael.png");
+k.loadSprite("rene", "sprites/rene.png");
+k.loadSprite("nino", "sprites/nino.png");
+k.loadSprite("franziska", "sprites/franziska.png");
+k.loadSprite("felicitas", "sprites/felicitas.png");
+k.loadSprite("laura", "sprites/laura.png");
+k.loadSprite("kyan", "sprites/kyan.png");
+k.loadSprite("florian", "sprites/florian.png");
+
 k.loadSprite("lehrerin", "sprites/lehrerin.png");
 
 k.loadSprite("dog", "sprites/dog.png");
@@ -62,19 +77,19 @@ k.loadSound("collisionSound", "sounds/hit.mp3");
 
 const PLAYERS = [
   { name: "Lan", sprite: "bean" },
-  { name: "Viktoria", sprite: "bean" },
+  { name: "Viktoria", sprite: "viktoria" },
   { name: "Marie", sprite: "marie", collisionAreaWidth: 50 },
-  { name: "Nora", sprite: "bean" },
-  { name: "Lorenz", sprite: "bean" },
-  { name: "Raphael", sprite: "bean" },
-  { name: "Kyan", sprite: "bean" },
-  { name: "Rene", sprite: "bean" },
-  { name: "Florian", sprite: "bean" },
-  { name: "Franziska", sprite: "bean" },
-  { name: "Emilia", sprite: "bean" },
-  { name: "Felicitas", sprite: "bean" },
-  { name: "Laura", sprite: "bean" },
-  { name: "Nino", sprite: "bean" },
+  { name: "Nora", sprite: "nora", collisionAreaWidth: 50 },
+  { name: "Lorenz", sprite: "lorenz" },
+  { name: "Raphael", sprite: "raphael", collisionAreaWidth: 50 },
+  { name: "Kyan", sprite: "kyan" },
+  { name: "Rene", sprite: "rene" },
+  { name: "Florian", sprite: "florian", collisionAreaWidth: 50 },
+  { name: "Franziska", sprite: "franziska" },
+  { name: "Emilia", sprite: "emilia" },
+  { name: "Felicitas", sprite: "felicitas" },
+  { name: "Laura", sprite: "laura", collisionAreaWidth: 50 },
+  { name: "Nino", sprite: "nino" },
   { name: "Fr. Jurušić", sprite: "lehrerin", collisionAreaWidth: 50 },
 ];
 
