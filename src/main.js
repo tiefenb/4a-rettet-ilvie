@@ -70,10 +70,21 @@ k.loadSprite("florian", "sprites/florian.png");
 k.loadSprite("lehrerin", "sprites/lehrerin.png");
 
 k.loadSprite("dog", "sprites/dog.png");
-k.loadSprite("goal", "sprites/star.png"); // Platzhalter für das Ziel
 k.loadSprite("asteroid", "sprites/asteroid.png");
 k.loadSprite("direktion", "sprites/direktion.png");
 k.loadSound("collisionSound", "sounds/hit.mp3");
+
+k.loadSound("music", "sounds/music.mp3");
+
+let musicStarted = false;
+function startMusic() {
+
+  if(!musicStarted) {
+    k.play("music", { loop: true });
+  }
+
+  musicStarted = true;
+}
 
 const PLAYERS = [
   { name: "Lan", sprite: "bean" },
@@ -334,6 +345,8 @@ k.scene("intro", () => {
     
     // Klickereignis auf den Hintergrund
     background.onClick(() => {
+      startMusic();
+
       selectedPlayerIndex = index;
       selectedPlayer = PLAYERS[selectedPlayerIndex];
       localStorage.setItem("selectedPlayer", selectedPlayerIndex);
