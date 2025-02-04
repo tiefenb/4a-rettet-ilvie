@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <title>Rettet Ilvie</title>
     <meta charset="utf-8">
+    <meta property="og:image" content="/apple-touch-icon.png">
+
+    <title>Die 4a rettet Ilvie</title>
+    <meta property="og:title" content="Die 4a rettet Ilvie">
+    
+    <link rel="preload" href="sounds/music.mp3" as="audio" type="audio/mpeg">
+    <link rel="preload" href="sounds/hit.mp3" as="audio" type="audio/mpeg">
+    <link rel="preload" href="sprites/asteroid.png" as="image" type="image/png">
+    <link rel="preload" href="sprites/dog.png" as="image" type="image/png">
+    <link rel="preload" href="sprites/direktion.png" as="image" type="image/png">
     <link rel="modulepreload" href="src/main.js">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style type="text/css">
+      #rotateMessage {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        color: white;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 24px;
+      }
+    </style>
 </head>
 <body style="overflow:hidden">
-    <div id="rotate-message" style="
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: black;
-  color: white;
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 24px;
-">
-  Bitte drehen Sie Ihr Gerät in den Hochformatmodus und laden Sie das Spiel neu.
-</div>
-<script src="src/main.js" type="module"></script>
+  <div id="rotate-message">
+    Bitte drehen Sie Ihr Gerät in den Hochformatmodus und laden Sie das Spiel neu.
+  </div>
+  <script src="src/main.js" type="module"></script>
 </body>
 </html>
