@@ -9,7 +9,9 @@ This project was part of an interactive session where students learned about sof
 Play the game here: [4A Rettet Ilvie](https://tiefenb.github.io/4a-rettet-ilvie/)
 
 ## How It Works
-- Players collect valuable objects for points while avoiding obstacles.
+- The mission is to rescue the dog Ilvie and bring her back to the school director.
+- Players must navigate through space while avoiding asteroids.
+- If hit by an asteroid, a math problem must be solved to continue.
 - The game features characters and elements designed by the students.
 - Built using **Kaplay.js**, a beginner-friendly JavaScript game framework.
 
