@@ -1,0 +1,26 @@
+CACHE MANIFEST
+#v1
+site.webmanifest
+apple-touch-icon.png
+favicon-32x32.png
+favicon-16x16.png
+sprites/direktion.png
+sprites/dog.png
+sprites/asteroid.png
+sounds/hit.mp3
+sounds/music.mp3
+sprites/bean.png
+sprites/emilia.png
+sprites/felicitas.png
+sprites/florian.png
+sprites/franziska.png
+sprites/kyan.png
+sprites/laura.png
+sprites/lehrerin.png
+sprites/lorenz.png
+sprites/marie.png
+sprites/nino.png
+sprites/raphael.png
+sprites/rene.png
+sprites/viktoria.png
+src/main.js
