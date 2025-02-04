@@ -37,29 +37,37 @@
     <style type="text/css">
       #rotateMessage {
         display: none;
+        flex-direction: column;
+        gap: 50px;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: black;
-        color: white;
-        z-index: 1000;
+        background-color: #000;
+        color: #fff;
         align-items: center;
         justify-content: center;
         text-align: center;
-        font-size: 24px;
+        font-size: 32px;
+        z-index: 1000;
       }
 
       body {
         overflow: hidden;
-        background-color: #000000;
+        background-color: #000;
       }
     </style>
 </head>
 <body>
-  <div id="rotate-message">
-    Bitte drehen Sie Ihr Gerät in den Hochformatmodus und laden Sie das Spiel neu.
+  <div id="rotateMessage">
+    <div>
+      <img src="sprites/asteroid.png" alt="Asteroid" loading="lazy" height="90" width="90">
+    </div>
+    <div>
+      Bitte drehen Sie Ihr Gerät in den <br>
+      Hochformatmodus und laden Sie das Spiel neu.
+    </div>
   </div>
   <script src="src/main.js" type="module"></script>
 </body>

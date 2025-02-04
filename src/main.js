@@ -27,17 +27,16 @@ window.addEventListener("resize", () => {
 function checkOrientation() {
 
   if (isMobile) {
-    console.log("hallo", window.innerWidth, window.innerHeight);
     if (window.innerWidth > window.innerHeight) {
       // Landscape mode
-      document.getElementById("rotate-message").style.display = "flex";
+      document.getElementById("rotateMessage").style.display = "flex";
     } else {
       // Portrait mode
-      document.getElementById("rotate-message").style.display = "none";
+      document.getElementById("rotateMessage").style.display = "none";
     }
   } else {
     // Auf dem Desktop sicherstellen, dass die Nachricht ausgeblendet ist
-    document.getElementById("rotate-message").style.display = "none";
+    document.getElementById("rotateMessage").style.display = "none";
   }
 }
 
