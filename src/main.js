@@ -49,10 +49,8 @@ window.addEventListener("orientationchange", () => {
 checkOrientation();
 
 // Laden der benötigten Sprites und Sounds
-k.loadSprite("bean", "sprites/bean.png");
-
 k.loadSprite("marie", "sprites/marie.png");
-// k.loadSprite("lan", "sprites/lan.png");
+k.loadSprite("lan", "sprites/lan.png");
 k.loadSprite("viktoria", "sprites/viktoria.png");
 k.loadSprite("emilia", "sprites/emilia.png");
 k.loadSprite("nora", "sprites/nora.png");
@@ -86,7 +84,7 @@ function startMusic() {
 }
 
 const PLAYERS = [
-  { name: "Lan", sprite: "bean" },
+  { name: "Lan", sprite: "lan", collisionAreaWidth: 60 },
   { name: "Viktoria", sprite: "viktoria" },
   { name: "Marie", sprite: "marie", collisionAreaWidth: 50 },
   { name: "Nora", sprite: "nora", collisionAreaWidth: 50 },
