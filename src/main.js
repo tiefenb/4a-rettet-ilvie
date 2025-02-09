@@ -4,6 +4,12 @@ import "kaplay/global";
 // Überprüfen, ob es sich um ein Mobilgerät handelt
 const isMobile = /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) || (navigator.userAgent.includes("Macintosh") && 'ontouchend' in document);
 
+if (isMobile && screen && screen.orientation && screen.orientation.lock) {
+  screen.orientation.lock("portrait").catch(err => {
+    console.warn("Bildschirm-Sperre nicht möglich:", err);
+  });
+}
+
 // Initialisierung von Kaplay mit Hintergrundfarbe
 const k = kaplay({
   background: [0, 0, 0], // Hintergrund schwarz
