@@ -1,6 +1,7 @@
 {
     "name": "Die 4a rettet Ilvie",
     "short_name": "4a-Spiel",
+    "start_url": "https://tiefenb.github.io/4a-rettet-ilvie/",
     "icons": [
       {
         "src": "/android-chrome-192x192.png",
